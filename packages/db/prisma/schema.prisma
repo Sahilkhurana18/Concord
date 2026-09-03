@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Auth (NextAuth email/magic-link) ---
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+
+  accounts Account[]
+  sessions Session[]
+  docs     Doc[]          @relation("DocOwner")
+
+  createdAt DateTime @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- Core domain ---
+
+model Doc {
+  id        String   @id @default(cuid())
+  title     String   @default("Untitled Document")
+  ownerId   String
+  owner     User     @relation("DocOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  collaborators Collaborator[]
+  shareLinks    ShareLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model Collaborator {
+  id        String   @id @default(cuid())
+  docId     String
+  doc       Doc      @relation(fields: [docId], references: [id], onDelete: Cascade)
+  email     String
+  permission String  // "view" | "edit"
+  status    String   @default("invited") // "invited" | "accepted"
+  invitedAt DateTime @default(now())
+
+  @@unique([docId, email])
+  @@index([docId])
+}
+
+model ShareLink {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  docId      String
+  doc        Doc       @relation(fields: [docId], references: [id], onDelete: Cascade)
+  permission String    // "view" | "edit"
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  @@index([docId])
+}

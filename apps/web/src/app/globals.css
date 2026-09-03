@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #efeee9;
+  --ink: #21201c;
+  --muted: #6e6b62;
+  --border: #dad6cb;
+  --accent: #2b5f6b;
+  --synced: #3f7a5c;
+}
+
+.dark {
+  --paper: #1a1d1b;
+  --ink: #e7e4dc;
+  --muted: #9c988d;
+  --border: #33362f;
+  --accent: #6fb3b8;
+  --synced: #5fa87f;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ProseMirror {
+  outline: none;
+  min-height: 340px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted);
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror h1 {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+.ProseMirror h2 {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+/* Collaboration cursor styles (Tiptap collaboration-cursor extension) */
+.collaboration-cursor__caret {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+.collaboration-cursor__label {
+  border-radius: 3px 3px 3px 0;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  left: -1px;
+  padding: 2px 6px;
+  position: absolute;
+  top: -1.4em;
+  user-select: none;
+  white-space: nowrap;
+}
