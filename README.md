@@ -106,6 +106,7 @@ your changes merge in without conflict.
 - [x] Shareable view-only links with optional expiry and manual revocation
 - [x] Export document as PDF or PNG
 - [x] Persistent Postgres storage via Prisma (docs, collaborators, links)
+- [x] Delete documents (owner only, from dashboard or the doc page)
 - [ ] Version history / time-travel using Yjs's UndoManager
 - [ ] Granular block-level permissions
 

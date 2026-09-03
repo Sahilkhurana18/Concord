@@ -20,6 +20,28 @@ app.use("/api/docs", docsRouter);
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
+// Global error handler — the last stop for anything that reaches here via
+// asyncHandler's next(err), or any synchronous throw in a non-async route.
+// Without this, Express's default behavior for unhandled errors can still
+// vary; being explicit means every failure becomes a clean 500 response
+// instead of ever risking the process going down.
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error("[server] Unhandled route error:", err);
+  if (res.headersSent) return;
+  res.status(500).json({ error: "Something went wrong on our end." });
+});
+
+// Last-resort safety net: if something still throws or rejects outside of
+// Express's request/response cycle entirely (a stray promise, a timer
+// callback, etc.), log it instead of letting Node terminate the process —
+// keeping the sync server and every other in-flight connection alive.
+process.on("unhandledRejection", (reason) => {
+  console.error("[server] Unhandled promise rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[server] Uncaught exception:", err);
+});
+
 const httpServer = createServer(app);
 
 // The Yjs sync layer rides on its own WebSocket server on the same port,

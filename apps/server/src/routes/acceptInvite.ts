@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { prisma } from "db";
 import { requireUser } from "../lib/auth";
+import { asyncHandler } from "../lib/asyncHandler";
 
 const router = Router();
 
 // Called when a logged-in user opens their invite link. Marks them as an
 // accepted collaborator so they show up in the doc's collaborator list and
 // the doc appears in their "shared with me" dashboard section.
-router.post("/", requireUser, async (req, res) => {
+router.post("/", requireUser, asyncHandler(async (req, res) => {
   const { docId } = req.body as { docId?: string };
   const email = req.user!.email;
 
@@ -27,6 +28,6 @@ router.post("/", requireUser, async (req, res) => {
   });
 
   res.json({ ok: true, docId });
-});
+}));
 
 export default router;

@@ -7,6 +7,7 @@ import { Editor } from "../../../components/Editor";
 import { SignOutButton } from "../../../components/SignOutButton";
 import { ThemeToggle } from "../../../components/ThemeToggle";
 import { DocTitle } from "../../../components/DocTitle";
+import { DeleteDocButton } from "../../../components/DeleteDocButton";
 import jwt from "jsonwebtoken";
 
 const SHARE_LINK_SECRET = process.env.SHARE_LINK_SECRET ?? "dev-secret-change-me";
@@ -72,6 +73,7 @@ export default async function DocPage({
         </Link>
         <div className="flex items-center gap-3">
           <ThemeToggle />
+          {isOwner && <DeleteDocButton docId={doc.id} docTitle={doc.title} />}
           {session?.user && <SignOutButton />}
         </div>
       </div>

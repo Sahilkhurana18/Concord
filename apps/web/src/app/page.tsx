@@ -64,7 +64,7 @@ export default async function HomePage() {
           <CreateDocButton />
         </div>
 
-        <DocList title="Owned by you" docs={owned} emptyLabel="Nothing here yet — start your first document." />
+        <DocList title="Owned by you" docs={owned} emptyLabel="Nothing here yet — start your first document." deletable />
         <DocList title="Shared with you" docs={sharedWithMe} emptyLabel="Nothing shared with you yet." />
       </div>
     </main>

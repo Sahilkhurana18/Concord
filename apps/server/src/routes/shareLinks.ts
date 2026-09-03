@@ -2,6 +2,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { prisma } from "db";
 import { requireUser } from "../lib/auth";
+import { asyncHandler } from "../lib/asyncHandler";
 import type { CreateShareLinkRequest } from "shared/types";
 
 const router = Router();
@@ -10,7 +11,7 @@ const SECRET = process.env.SHARE_LINK_SECRET ?? "dev-secret-change-me";
 // Create a share link. The JWT itself encodes docId + permission + expiry,
 // so *verifying* a link needs no DB lookup — just a signature check. We also
 // persist a row so links can be listed and revoked from the doc's settings.
-router.post("/", requireUser, async (req, res) => {
+router.post("/", requireUser, asyncHandler(async (req, res) => {
   const { docId, permission, expiresInHours } = req.body as CreateShareLinkRequest;
   const requester = req.user!;
 
@@ -34,7 +35,7 @@ router.post("/", requireUser, async (req, res) => {
   await prisma.shareLink.create({ data: { token, docId, permission, expiresAt } });
 
   res.json({ token, docId, permission, expiresAt });
-});
+}));
 
 // Verify a share link token — called when someone opens a /doc/:id?token=... URL.
 // Checks both the JWT signature/expiry AND the DB row, so a revoked link
@@ -58,7 +59,7 @@ router.get("/verify", async (req, res) => {
 });
 
 // Revoke a share link without waiting for its JWT to expire.
-router.delete("/:token", requireUser, async (req, res) => {
+router.delete("/:token", requireUser, asyncHandler(async (req, res) => {
   const record = await prisma.shareLink.findUnique({ where: { token: req.params.token } });
   if (!record) return res.status(404).json({ error: "Link not found" });
 
@@ -69,6 +70,6 @@ router.delete("/:token", requireUser, async (req, res) => {
 
   await prisma.shareLink.update({ where: { token: req.params.token }, data: { revokedAt: new Date() } });
   res.json({ ok: true });
-});
+}));
 
 export default router;

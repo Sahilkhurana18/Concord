@@ -2,12 +2,13 @@ import { Router } from "express";
 import { sendInviteEmail } from "../lib/email";
 import { prisma } from "db";
 import { requireUser } from "../lib/auth";
+import { asyncHandler } from "../lib/asyncHandler";
 import { randomUUID } from "crypto";
 import type { InviteRequest } from "shared/types";
 
 const router = Router();
 
-router.post("/", requireUser, async (req, res) => {
+router.post("/", requireUser, asyncHandler(async (req, res) => {
   const { docId, email, permission } = req.body as InviteRequest;
   const inviter = req.user!;
 
@@ -44,6 +45,6 @@ router.post("/", requireUser, async (req, res) => {
   }
 
   res.json({ ok: true, invitedBy: inviter.id });
-});
+}));
 
 export default router;

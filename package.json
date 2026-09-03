@@ -20,8 +20,5 @@
   "overrides": {
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
-  },
-  "dependencies": {
-    "@prisma/client": "^5.22.0"
   }
 }
